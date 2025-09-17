@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <template id="option_header_brand_logo_inherit" inherit_id="website.option_header_brand_logo"
+              name="Header Brand Logo Inherit">
+        <xpath expr="//a[@t-attf-class='navbar-brand logo #{_link_class}']/span[@t-field='website.logo']"
+               position="replace">
+            <t t-set="current_lang" t-value="request.context.get('lang')"/>
+            <t t-if="current_lang == 'ar_001'">
+                <a data-name="Navbar Logo" href="/" t-attf-class="navbar-brand logo #{_link_class}">
+                    <img t-att-src="'/language_base_logo/static/description/img/arabic_logo.png'" width="auto" height="auto"
+                         role="img"
+                         t-att-aria-label="'Logo of %s' % website.name" t-att-title="website.name"/>
+                </a>
+            </t>
+            <t t-else="">
+                <a data-name="Navbar Logo" href="/" t-attf-class="navbar-brand logo #{_link_class}">
+                    <span t-field="website.logo" t-options="{'widget': 'image', 'width': 95, 'height': 40}" role="img"
+                          t-att-aria-label="'Logo of %s' % website.name" t-att-title="website.name"/>
+                    <!--                    <img t-att-src="'/language_base_logo/static/description/img/logo_default.png'" width="95"-->
+                    <!--                         height="40" role="img"-->
+                    <!--                         t-att-aria-label="'Logo of %s' % website.name" t-att-title="website.name"/>-->
+                </a>
+            </t>
+        </xpath>
+    </template>
+
+
+</odoo>

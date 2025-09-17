@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="reason_cancel_form_view" model="ir.ui.view">
+        <field name="name">reason.cancel.form</field>
+        <field name="model">reason.cancel</field>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <form string="Stages">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Reason to Cancel"/>
+                        </h1>
+                    </div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="reason_cancel_tree_view" model="ir.ui.view">
+        <field name="name">reason.cancel.tree</field>
+        <field name="model">reason.cancel</field>
+        <field name="arch" type="xml">
+            <tree string="Stages" multi_edit="1">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="reason_cancel_action" model="ir.actions.act_window">
+        <field name="name">Reason To Cancel</field>
+        <field name="res_model">reason.cancel</field>
+        <field name="view_id" ref="reason_cancel_form_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Reason
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="reason_cancel_menu_root"
+              name="Reason To Cancel"
+              parent="stock.menu_stock_config_settings"
+              action="reason_cancel_action"
+              sequence="2"/>
+
+
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_move_inherit_total_qty" model="ir.ui.view">
+        <field name="name">account.move.inherit.total.qty</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')">
+                    <group>
+                        <field string="Invoiced Qty" name="total_qty_billed"/>
+                    </group>
+                </group>
+                <group invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt')">
+                    <group>
+                        <field string="Billed Qty" name="total_qty_billed"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

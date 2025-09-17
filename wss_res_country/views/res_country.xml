@@ -1,0 +1,43 @@
+<odoo>
+    <record model="ir.ui.view" id="country_view_inherit">
+        <field name="name">country.inherit.form</field>
+        <field name="model">res.country</field>
+        <field name="inherit_id" ref="base.view_country_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="active" widget="boolean_toggle"/>
+                <field name="website_visible" widget="boolean_toggle"/>
+                <field name="website_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="country_view_inherit_tree">
+        <field name="name">country.inherit.form</field>
+        <field name="model">res.country</field>
+        <field name="inherit_id" ref="base.view_country_tree"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="active" widget="boolean_toggle"/>
+                <field name="website_visible" widget="boolean_toggle"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_res_country_search" model="ir.ui.view">
+        <field name="model">res.country</field>
+        <field name="arch" type="xml">
+            <search string="Countries">
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="phone_code"/>
+                <field name="website_ids"/>
+                <filter string="Active" name="active" domain="[('active', '=',True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=',False)]"/>
+                <separator/>
+                <filter string="Website Visible" name="website_visible" domain="[('website_visible', '=',True)]"/>
+                <filter string="Website Invisible" name="website_invisible" domain="[('website_visible', '=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+
+</odoo>

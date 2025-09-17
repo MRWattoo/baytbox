@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_picking_form_view_inherit" model="ir.ui.view">
+        <field name="name">stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <field name="picking_type_id" position="after">
+                <field name="cancel_reason_id"/>
+            </field>
+            <xpath expr="//button[@name='button_validate'][hasclass('oe_highlight')]" position="replace">
+                <button name="button_validate" invisible="state not in ('delivered', 'picked_from_customer')" string="Validate" type="object" class="oe_highlight" groups="stock.group_stock_user" data-hotkey="v"/>
+            </xpath>
+            <xpath expr="//button[@name='button_validate'][hasclass('o_btn_validate')]" position="replace">
+                <button name="button_validate" invisible="1" string="Validate" type="object" groups="stock.group_stock_user" class="o_btn_validate" data-hotkey="v"/>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="replace">
+                <button name="action_cancel" invisible="state in ('delivered', 'cancel')"
+                        string="Cancel11" groups="base.group_user" type="object" data-hotkey="x"/>
+            </xpath>
+            <xpath expr="//header[1]/button[@name='button_validate']" position="after">
+                <field name="return_id" invisible="1"/>
+                <button name="action_in_return_accepted" invisible="picking_type_code not in ['dropship'] or not return_id and picking_type_code in ['dropship'] or return_id and picking_type_code in ['dropship'] and state not in('assigned')"
+                        string="Return Accepted" type="object" groups="stock.group_stock_user" class="o_btn_validate"
+                        data-hotkey="v"/>
+                <button name="action_in_assigned_to_picker" invisible="picking_type_code not in ['dropship'] or not return_id and picking_type_code in ['dropship'] or return_id and picking_type_code in ['dropship'] and state not in('return_accepted')"
+                        string="Assigned to Picker" type="object" groups="stock.group_stock_user" class="o_btn_validate"
+                        data-hotkey="v"/>
+                <button name="action_in_picked_from_customer" invisible="picking_type_code not in ['dropship'] or not return_id and picking_type_code in ['dropship'] or return_id and picking_type_code in ['dropship'] and state not in('assigned_to_picker')"
+                        string="Picked from Customer" type="object" groups="stock.group_stock_user" class="o_btn_validate"
+                        data-hotkey="v"/>
+                <button name="action_in_progress" invisible="state not in ('assigned') or picking_type_code in ['dropship'] and return_id"
+                        string="In Progress" type="object" groups="stock.group_stock_user" class="o_btn_validate"
+                        data-hotkey="v"/>
+                <button name="action_ready_to_ship" invisible="state not in ('progress') or picking_type_code in ['dropship'] and return_id"
+                        string="Ready To Ship" type="object" groups="stock.group_stock_user" class="o_btn_validate"
+                        data-hotkey="v"/>
+                <button name="action_delivered" invisible="state not in ('ship') or picking_type_code in ['dropship'] and return_id"
+                        string="Delivered" type="object" groups="stock.group_stock_user" class="o_btn_validate"
+                        data-hotkey="v"/>
+
+            </xpath>
+            <!--            <xpath expr="//header[1]/field[2]" position="replace">-->
+            <!--                <field name="state" widget="statusbar"-->
+            <!--                       statusbar_visible="draft,confirmed,assigned,progress,ship,delivered,done"/>-->
+            <!--            </xpath>-->
+
+        </field>
+    </record>
+
+    <template id="brand_promotion_message" inherit_id="web.brand_promotion_message" name="Remove Powered by Odoo">
+        <xpath expr="." position="replace">
+            <div></div>
+        </xpath>
+    </template>
+    <template id="portal_record_sidebar_inherit" inherit_id="portal.portal_record_sidebar"
+              name="My Portal Record Sidebar">
+        <xpath expr="//div[@class='d-none d-lg-block mt-5 small text-center text-muted'][1]" position="replace">
+            <div></div>
+        </xpath>
+    </template>
+    <template id="sale_order_portal_content_inherit" inherit_id="sale.sale_order_portal_content" name="Sales Order Portal Content">
+        <xpath expr="//section[@id='terms'][1]" position="replace">
+            <div></div>
+        </xpath>
+    </template>
+
+
+</odoo>

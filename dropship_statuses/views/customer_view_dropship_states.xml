@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sale_order_portal_content_inherit_sale_stock_inherit"
+              inherit_id="sale_stock.sale_order_portal_content_inherit_sale_stock" name="Orders Shipping Followup">
+        <xpath expr="//div[@class='d-flex align-items-center justify-content-between'][1]/span[@class='small badge text-bg-danger orders_label_text_align'][1]"
+               position="after">
+            <span t-elif="picking.state == 'progress'"
+                  class="small badge text-bg-success orders_label_text_align">
+                <i class="fa fa-fw fa-spinner fa-spin"/>In Progress
+            </span>
+            <span t-elif="picking.state == 'ship'"
+                  class="small badge text-bg-success orders_label_text_align">
+                <i class="fa fa-fw fa-truck"/>Ready To Ship
+            </span>
+            <span t-elif="picking.state == 'delivered'"
+                  class="small badge text-bg-success orders_label_text_align">
+                <i class="fa fa-fw fa-check-circle"/>Delivered
+            </span>
+        </xpath>
+        <xpath expr="//div[@class='d-flex flex-column'][1]/div[@class='small d-lg-inline-block'][1]"
+               position="replace">
+            <div class="small d-lg-inline-block" t-if="picking.date_done or picking.scheduled_date">
+                Date:
+                <span class="text-muted"
+                      t-field="picking.date_done"
+                      t-options="{'date_only': True}"/>
+                <span t-if="picking.state in ['draft', 'waiting', 'confirmed', 'assigned', 'progress', 'ship', 'delivered']"
+                      class="text-muted"
+                      t-field="picking.scheduled_date"
+                      t-options="{'date_only': True}"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[@class='d-flex justify-content-between align-items-center'][1]/span[@class='small badge text-bg-success orders_label_text_align'][1]"
+               position="after">
+            <span t-elif="picking.state == 'progress'"
+                  class="small badge text-bg-success orders_label_text_align">
+                <i class="fa fa-fw fa-spinner fa-spin"/>In Progress
+            </span>
+            <span t-elif="picking.state == 'ship'"
+                  class="small badge text-bg-success orders_label_text_align">
+                <i class="fa fa-fw fa-truck"/>Ready To Ship
+            </span>
+            <span t-elif="picking.state == 'delivered'"
+                  class="small badge text-bg-success orders_label_text_align">
+                <i class="fa fa-fw fa-check-circle"/>Delivered
+            </span>
+        </xpath>
+<!--        <xpath expr="//div[@class='col-12 col-lg-6 mb-4'][2]/t[1]/div[1]/div[@class='small d-lg-inline-block'][1]"-->
+<!--               position="replace">-->
+<!--            <div class="small d-lg-inline-block">-->
+<!--                Date:-->
+<!--                <span class="text-muted"-->
+<!--                      t-field="picking.date_done"-->
+<!--                      t-options="{'date_only': True}"/>-->
+<!--                <span t-if="picking.state in ['draft', 'waiting', 'confirmed', 'assigned']"-->
+<!--                      class="text-muted"-->
+<!--                      t-field="picking.scheduled_date"-->
+<!--                      t-options="{'date_only': True}"/>-->
+<!--            </div>-->
+<!--        </xpath>-->
+    </template>
+
+<template id="custom_pager" inherit_id="portal.pager">
+        <!--<xpath expr="//ul/t" position="before">-->
+        <!--    <li class="page-item total-page-item" t-if="pager['page']['num'] &gt; 3">-->
+        <!--        <a id="total-page-link" t-att-href="pager['page_first']['url']" class="page-link total-page-link">-->
+        <!--            <span>1</span>-->
+        <!--        </a>-->
+        <!--    </li>-->
+        <!--                  <li class="page-item separator-item" t-if="pager['page']['num'] &gt; 4">-->
+        <!--        <span class="page-separator">...</span>-->
+        <!--    </li>-->
+
+        <!--</xpath>-->
+        <!--<xpath expr="//ul/t" position="after">-->
+        <!--    <t>-->
+        <!--  <li class="page-item separator-item" t-if="pager['page']['num']+3 &lt; pager['page_count']">-->
+        <!--        <span class="page-separator">...</span>-->
+        <!--    </li>-->
+        <!--    <li class="page-item total-page-item" t-if="pager['page']['num']+2 &lt; pager['page_count']">-->
+        <!--        <a id="total-page-link" t-att-href="pager['page_last']['url']" class="page-link total-page-link">-->
+        <!--            <span t-esc="pager['page_count']"/>-->
+        <!--        </a>-->
+        <!--    </li>-->
+        <!--    </t>-->
+        <!--</xpath>-->
+        <xpath expr="//ul/t" position="before">
+    <li class="page-item total-page-item" t-if="pager['page']['num'] &gt; 3">
+        <a id="total-page-link" t-att-href="pager['page_first']['url']" class="page-link total-page-link">
+            <span>1</span>
+        </a>
+    </li>
+    <li class="page-item separator-item" t-if="pager['page']['num'] &gt; 4" data-page="2">
+        <span class="page-separator">...</span>
+    </li>
+</xpath>
+
+<xpath expr="//ul/t" position="after">
+    <t>
+        <li class="page-item separator-item" t-if="pager['page']['num']+3 &lt; pager['page_count']" data-page="5">
+            <span class="page-separator">...</span>
+        </li>
+        <li class="page-item total-page-item" t-if="pager['page']['num']+2 &lt; pager['page_count']">
+            <a id="total-page-link" t-att-href="pager['page_last']['url']" class="page-link total-page-link">
+                <span t-esc="pager['page_count']"/>
+            </a>
+        </li>
+    </t>
+</xpath>
+
+<!--         <xpath expr="//li[2]/a[1]" position="after">
+            <span class="page-separator">.....</span>
+            <a id="total-page-link" t-att-href="pager['page_last']['url']" class="page-link total-page-link">
+                <span t-esc="pager['page_count']"/>
+            </a>
+        </xpath> -->
+        <xpath expr="//ul" position="after">
+<!--<script>-->
+<!--document.addEventListener('DOMContentLoaded', function() {-->
+<!--    var separatorItems = document.querySelectorAll('.separator-item');-->
+
+<!--    separatorItems.forEach(function(item) {-->
+<!--        item.addEventListener('click', function() {-->
+<!--            // Get the current page number from the active link-->
+<!--            var currentPageElement = document.querySelector('.page-item.active .page-link span');-->
+<!--            var currentPage = currentPageElement ? parseInt(currentPageElement.textContent) : 1;-->
+
+<!--            // Get the total number of pages from the last page link-->
+<!--            var totalPagesElement = document.querySelector('.total-page-item:last-child .page-link span');-->
+<!--            var totalPages = totalPagesElement ? parseInt(totalPagesElement.textContent) : 1;-->
+
+<!--            // Get the number of pages to skip-->
+<!--            var skip = parseInt(item.getAttribute('data-skip')) || 5;-->
+
+<!--            // Calculate the new page number-->
+<!--            var newPage = currentPage + skip;-->
+
+<!--            // Ensure newPage is within valid range-->
+<!--            if (newPage > totalPages) {-->
+<!--                newPage = totalPages;-->
+<!--            }-->
+
+<!--            // Redirect to the new page-->
+<!--            var baseUrl = '/your-url';  // Modify this to match your base URL-->
+<!--            window.location.href = baseUrl + '?page=' + newPage;-->
+<!--        });-->
+<!--    });-->
+<!--});-->
+<!--</script>-->
+<!--<script>-->
+<!--document.addEventListener('DOMContentLoaded', function() {-->
+<!--    var separatorItems = document.querySelectorAll('.separator-item');-->
+
+<!--    separatorItems.forEach(function(item) {-->
+<!--        item.addEventListener('click', function() {-->
+<!--            // Get the current page number from the active link-->
+<!--            var currentPageElement = document.querySelector('.page-item.active .page-link span');-->
+<!--            var currentPage = currentPageElement ? parseInt(currentPageElement.textContent) : 1;-->
+
+<!--            // Get the number of pages to skip-->
+<!--            var skip = parseInt(item.getAttribute('data-skip')) || 5;-->
+
+<!--            // Calculate the new page number-->
+<!--            var newPage = currentPage + skip;-->
+
+<!--            // Get the total number of pages from a total page element (if available)-->
+<!--            var totalPagesElement = document.querySelector('.total-page-item:last-child .page-link span');-->
+<!--            var totalPages = totalPagesElement ? parseInt(totalPagesElement.textContent) : currentPage + skip; // Fallback to newPage if no totalPages-->
+
+<!--            // Ensure newPage is within valid range-->
+<!--            if (newPage > totalPages) {-->
+<!--                newPage = totalPages;-->
+<!--            }-->
+
+<!--            // Get the base URL from the current page URL-->
+<!--            var currentUrl = window.location.href;-->
+<!--            var baseUrl = currentUrl.split('/');  // Strip query parameters-->
+<!--            console.log(baseUrl);-->
+<!--            console.log(baseUrl);-->
+<!--            console.log(baseUrl[0]);-->
+            
+
+            <!--// Redirect to the new page-->
+            <!--window.location.href = baseUrl + '/page/' + newPage;-->
+<!--        });-->
+<!--    });-->
+<!--});-->
+<!--</script>-->
+
+            <style>
+                .separator-item .page-separator {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                height: 35px;
+                margin-left: 5px;
+                margin-right: 5px;
+                }
+                .page-item.separator-item {
+    cursor: pointer;
+}
+
+.page-item.separator-item:hover {
+    background-color: #f0f0f0;  /* Change this color as needed */
+    color: #000;  /* Change text color as needed */
+}
+
+            </style>
+        </xpath>
+</template>
+
+</odoo>

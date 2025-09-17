@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="whatsapp_res_partner" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='phone']" position="replace">
+                    <table>
+                        <tr>
+                            <td>
+                                <field name="phone" widget="phone"/>
+                            </td>
+                            <td>
+                                <button invisible="phone == False"
+                                        name="send_message_phone"
+                                        type="object"
+                                        string="Whatsapp"
+                                />
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </xpath>
+                <xpath expr="//field[@name='mobile']" position="replace">
+                    <table>
+                        <tr>
+                            <td>
+                                <field name="mobile" widget="phone"/>
+                            </td>
+                            <td>
+                                <button invisible="mobile == False"
+                                        name="send_message_mobile"
+                                        type="object"
+                                        string="Whatsapp"
+                                />
+
+                            </td>
+
+                        </tr>
+                    </table>
+
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

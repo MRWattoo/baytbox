@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <template id="brand_promotion" name="Brand Promotion">
+            <div class="o_brand_promotion">
+                <t t-call="web.brand_promotion_message">
+                    <t t-set="_message"></t>
+                    <t t-set="_utm_medium" t-valuef="portal"/>
+                </t>
+            </div>
+        </template>
+    <template id="brand_promotion_inherit" name="Brands Promotion" inherit_id="web.brand_promotion">
+    <xpath expr="//t[@t-call='web.brand_promotion_message']" position="replace">
+        <span></span>
+    </xpath>
+    </template>
+        
+    <template id="submit_buttonnnnnnnn" name="Payment" inherit_id="payment.submit_button">
+
+        <button name="o_payment_submit_button" position="replace">
+            <button name="o_payment_submit_button"
+                    id="o_payment_submit_button"
+                    type="submit"
+                    class="btn btn-primary w-100 w-md-auto ms-auto px-5"
+                    disabled="true"
+            >Buy Now</button>
+
+        </button>
+    </template>
+
+
+</odoo>

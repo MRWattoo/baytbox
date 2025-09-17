@@ -1,0 +1,867 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="product_pricelist_compare_price_tree_view_inherit">
+            <field name="name">product.pricelist.inherit.form</field>
+            <field name="model">product.pricelist</field>
+            <field name="inherit_id" ref="product.product_pricelist_view"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//page[@name='pricelist_rules']/field[@name='item_ids']/tree[1]/field[@name='fixed_price']" position="after">
+                    <field name="compare_list_price"/>
+                    <field name="delivery_fee"/>
+                </xpath>
+                 <xpath expr="//page[@name='pricelist_rules']/field[@name='item_ids']/tree[2]/field[@name='price']" position="after">
+                    <field name="compare_list_price"/>
+                    <field name="delivery_fee"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="product_pricelist_item_tree_view_inherit">
+            <field name="name">product.pricelist.item.inherit.form</field>
+            <field name="model">product.pricelist.item</field>
+            <field name="inherit_id" ref="product.product_pricelist_item_tree_view_from_product"/>
+            <field name="arch" type="xml">
+                 <field name="fixed_price" position="after">
+                    <field name="compare_list_price"/>
+                    <field name="delivery_fee"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="product_product_sku_inherit">
+            <field name="name">product.product.inherit.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                 <field name="website_sequence" position="after">
+                    <field name="saler_sku"/>
+                </field>
+            </field>
+        </record>
+    </data>
+    <template id="product_custom_text" inherit_id="website_sale.product_custom_text" active="True"
+              name="Terms and Conditions" priority="21">
+        <xpath expr="//div[@id='o_product_terms_and_share']/p" position="replace">
+            <p class="text-muted mb-0">
+                <a href="/terms" class="text-muted">
+                    <u>Terms and Conditions</u>
+                </a>
+                <br/>30-day money-back guarantee
+                <br/>
+                <t t-if="combination_info and 'delivery_lead_time' in combination_info and combination_info['delivery_lead_time'] and 'delivery_lead_time2' in combination_info and combination_info['delivery_lead_time2']">
+
+                    <span>Delivery Time:</span>
+                    <t t-esc="combination_info['delivery_lead_time2']"/>
+                    -
+                    <t t-esc="combination_info['delivery_lead_time']"/>
+                    Bussiness Days
+
+                </t>
+
+            </p>
+        </xpath>
+    </template>
+
+    <template id="website_sale_inherit_description" inherit_id="website_sale.product">
+<!--        <xpath expr="//div[@id='product_details']/h1" position="after">-->
+<!--            <t t-set="template_price_vals" t-value="product_variant._get_discount_price_wss()"/>-->
+<!--&lt;!&ndash;            <t t-esc="template_price_vals"/>&ndash;&gt;-->
+<!--            <t t-if="template_price_vals and 'base_percent2' in template_price_vals and template_price_vals['base_percent']">-->
+<!--                <div class="o_tag">-->
+<!--                    <t t-esc="template_price_vals['base_percent']"/>% off-->
+<!--                </div>-->
+<!--            </t>-->
+<!--            <br/>-->
+<!--            <t t-if="template_price_vals and 'delivery_lead_time' in template_price_vals and template_price_vals['delivery_lead_time']and 'delivery_lead_time2' in template_price_vals and template_price_vals['delivery_lead_time2']">-->
+<!--                <div class="o_tag">-->
+<!--                    <span>Delivery Time</span><t t-esc="template_price_vals['delivery_lead_time2']"/> - <t t-esc="template_price_vals['delivery_lead_time']"/>-->
+<!--                </div>-->
+<!--            </t>-->
+
+<!--        </xpath>-->
+
+
+        <xpath expr="//p[@t-field='product.description_sale']" position="attributes">
+            <attribute name="style">display: none;</attribute>
+        </xpath>
+        <xpath expr="//div[@id='o_wsale_cta_wrapper']" position="after">
+            <p t-field="product.description_sale" class="text-muted my-2" placeholder="A short description that will also appear on documents." />
+        </xpath>
+    </template>
+        <template id="product_price" inherit_id="website_sale.product_price">
+            <xpath expr="//div[@itemprop='offers']" position="replace">
+            <t t-set="template_price_vals" t-value="product_variant._get_discount_price_wss()"/>
+
+            <t t-if="combination_info and 'base_percent2' in combination_info and combination_info['base_percent']">
+                <div class="o_tag">
+                    <t t-esc="combination_info['base_percent']"/>% off
+                </div>
+            </t>
+            <br/>
+                <div itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer"
+                     t-attf-class="product_price mt-2 mb-3 {{'d-none' if combination_info['prevent_zero_price_sale'] else 'd-inline-block'}}">
+                    <h3 class="css_editable_mode_hidden">
+                        <span class="oe_price"
+                              style="white-space: nowrap;"
+                              t-out="int(round(combination_info['price']))"
+                              /><span t-esc="website.currency_id.symbol"/>
+                        <span itemprop="price" style="display:none;" t-out="int(round(combination_info['price']))"/>
+                        <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/>
+                        <span t-attf-class="text-danger oe_default_price ms-1 h5 {{'' if combination_info['has_discounted_price'] and not combination_info['compare_list_price'] else 'd-none'}}"
+                              style="text-decoration: line-through; white-space: nowrap;"
+                              t-esc="int(round(combination_info['list_price']))"
+                              t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"
+                              itemprop="listPrice"
+                        />
+                        <t t-if="is_view_active('website_sale.tax_indication')" t-call="website_sale.tax_indication"/>
+                        <del style="font-size:70%;"
+                             t-if="combination_info['compare_list_price'] and (combination_info['compare_list_price'] > combination_info['price'])">
+                            <bdi dir="inherit">
+                                <span class="oe_compare_price"
+                                      t-esc="int(round(combination_info['compare_list_price']))"
+                                />
+                                <span t-esc="website.currency_id.symbol"/>
+                            </bdi>
+                        </del>
+                    </h3>
+                </div>
+
+                <div id="product_unavailable"
+                     t-attf-class="{{'d-flex' if combination_info['prevent_zero_price_sale'] else 'd-none'}}">
+                    <h3 class="fst-italic" t-field="website.prevent_zero_price_sale_text"/>
+                </div>
+            </xpath>
+        </template>
+
+        <template id="products_item" inherit_id="website_sale.products_item" name="Products item">
+        <xpath expr="//div[contains(@class, 'o_wsale_product_information_text')]" position="replace">
+            <div class="o_wsale_product_information_text flex-grow-1">
+                <h6 class="o_wsale_products_item_title mb-2">
+
+                    <a class="text-primary text-decoration-none product-name" itemprop="name" t-att-href="product_href">
+                        <span class="product-name" t-esc="product.truncated_name"/>
+                    </a>
+                    <a t-if="not product.website_published" role="button" t-att-href="product_href" class="btn btn-sm btn-danger" title="This product is unpublished.">
+                        Unpublished
+                    </a>
+                </h6>
+            </div>
+        </xpath>
+        <xpath expr="//div[contains(@class, 'oe_product_image')]/a" position="after">
+                <t t-set="template_price_vals" t-value="product._get_discount_price_wss()"/>
+
+            <t t-if="template_price_vals and 'base_percent2' in template_price_vals and template_price_vals['base_percent2']">
+                <div class="o_tag o_tag_discount">
+                    <t t-esc="template_price_vals['base_percent2']"/>% off
+                </div>
+            </t>
+        </xpath>
+
+            <xpath expr="//div[@itemprop='offers']" position="replace">
+
+
+                <div class="product_price" itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer">
+
+<!--                    <t t-if="('base_price' in template_price_vals and 'base_price2' in template_price_vals and 'price_reduce' in template_price_vals and 'price_reduce2' in template_price_vals) and (template_price_vals['base_price'] &gt; template_price_vals['price_reduce']) and (template_price_vals['price_reduce'] and template_price_vals['price_reduce2'] )">-->
+<!--                        <del t-attf-class="text-muted me-1 h6 mb-0" style="white-space: nowrap;">-->
+<!--                            <em class="small" t-esc="template_price_vals['base_price']" /><span t-esc="website.currency_id.symbol"/>-->
+<!--                            <em class="small" t-esc="template_price_vals['base_price2']" /><span t-esc="website.currency_id.symbol"/>-->
+<!--                        </del>-->
+<!--                    </t>-->
+<!--                    <t t-if="('base_price' in template_price_vals and 'base_price2' not in template_price_vals and 'price_reduce' in template_price_vals and 'price_reduce2' in template_price_vals) and (template_price_vals['base_price'] &gt; template_price_vals['price_reduce']) and (template_price_vals['price_reduce'] and template_price_vals['price_reduce2'] )">-->
+<!--                        <del t-attf-class="text-muted me-1 h6 mb-0" style="white-space: nowrap;">-->
+<!--                            <em class="small" t-esc="template_price_vals['base_price']" /><span t-esc="website.currency_id.symbol"/>-->
+<!--                            <em class="small" t-esc="template_price_vals['base_price2']" /><span t-esc="website.currency_id.symbol"/>-->
+<!--                        </del>-->
+<!--                    </t>-->
+                    <t t-if="('base_price' in template_price_vals and 'base_price2' in template_price_vals and 'price_reduce' in template_price_vals and 'price_reduce2' in template_price_vals) and (template_price_vals['base_price'] and template_price_vals['price_reduce'] and template_price_vals['base_price2'] and template_price_vals['price_reduce2'])">
+                        <del t-attf-class="text-muted me-1 h6 mb-0" style="white-space: nowrap;">
+                            <em class="small" t-esc="int(template_price_vals['base_price'])" /><span t-esc="website.currency_id.symbol"/>
+                            <em class="small" t-esc="int(template_price_vals['base_price2'])" /><span t-esc="website.currency_id.symbol"/>
+                        </del>
+                    </t>
+                    <t t-elif="('base_price' in template_price_vals  and 'price_reduce' in template_price_vals) and (template_price_vals['base_price'] &gt; template_price_vals['price_reduce'])">
+                        <del t-attf-class="text-muted me-1 h6 mb-0" style="white-space: nowrap;">
+                            <em class="small" t-esc="int(template_price_vals['base_price2'])" /><span t-esc="website.currency_id.symbol"/>
+                        </del>
+                    </t>
+                    <t t-elif="'base_price2' in template_price_vals and (template_price_vals['base_price2'] &gt; template_price_vals['price_reduce2']) and (template_price_vals['price_reduce2'])">
+                            <del t-attf-class="text-muted me-1 h6 mb-0" style="white-space: nowrap;">
+                                <em class="small" t-esc="int(template_price_vals['base_price2'])" /><span t-esc="website.currency_id.symbol"/>
+                            </del>
+                        </t>
+
+                    <br/>
+                    <t t-if="('base_price' in template_price_vals and 'base_price2' in template_price_vals and 'price_reduce' in template_price_vals and 'price_reduce2' in template_price_vals) and (template_price_vals['base_price'] and template_price_vals['price_reduce'] and template_price_vals['base_price2'] and template_price_vals['price_reduce2'])">
+                        <span class="h6 mb-0" t-esc="int(template_price_vals['price_reduce'])" /><span t-esc="website.currency_id.symbol"/>
+                        <span class="h6 mb-0">-</span>
+                        <span class="h6 mb-0" t-esc="int(template_price_vals['price_reduce2'])"/><span t-esc="website.currency_id.symbol"/>
+                    </t>
+                    <t t-elif="'base_price2' in template_price_vals and (template_price_vals['base_price2'] &gt; template_price_vals['price_reduce2']) and (template_price_vals['price_reduce2'])">
+                        <span class="h6 mb-0" t-esc="(template_price_vals['price_reduce2'])"/><span t-esc="website.currency_id.symbol"/>
+                    </t>
+                    <t t-elif="int(template_price_vals['price_reduce2'])">
+                    <span class="h6 mb-0" t-esc="template_price_vals['price_reduce2']"/><span t-esc="website.currency_id.symbol"/>
+                    </t>
+
+
+                </div>
+
+            </xpath>
+
+    </template>
+    <template id="checkout" inherit_id="website_sale.checkout">
+        <xpath expr="//t[@t-call='website_sale.checkout_layout']" position="replace">
+
+        <t t-call="website_sale.checkout_layout">
+
+
+            <t t-set="additional_title">Shop - Checkout</t>
+            <t t-set="redirect" t-valuef="/shop/checkout"/>
+            <t t-set="same_shipping"
+               t-value="bool(order.partner_shipping_id==order.partner_invoice_id or only_services)"/>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="mb-4">Address</h3>
+                </div>
+            </div>
+            <t t-call="website_sale.row_addresses">
+                <t t-set="order" t-value="order"/>
+                <t t-set="is_invoice" t-value="True"/>
+                <t t-set="addresses" t-value="billings"/>
+                <t t-set="selected_address" t-value="order.partner_invoice_id"/>
+            </t>
+            <!--            <t t-if="not only_services" groups="account.group_delivery_invoice_address">-->
+            <!--                <div class="row">-->
+            <!--                    <div class="col-lg-12">-->
+            <!--                        <h4>Shipping</h4>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--                <t t-call="website_sale.row_addresses">-->
+            <!--                    <t t-set="order" t-value="order"/>-->
+            <!--                    <t t-set="is_invoice" t-value="False"/>-->
+            <!--                    <t t-set="addresses" t-value="shippings"/>-->
+            <!--                    <t t-set="selected_address" t-value="order.partner_shipping_id"/>-->
+            <!--                </t>-->
+                        </t>
+        </xpath>
+    </template>
+
+
+    <template id="address" inherit_id="website_sale.address" name="Address Management">
+        <xpath expr="//div[contains(@class, 'oe_website_sale')]" position="replace">
+            <div class="oe_website_sale o_wsale_address_fill container py-2">
+                <div class="row">
+                    <div class="col-12">
+                        <t t-call="website_sale.wizard_checkout"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="oe_cart col-12 col-lg-8">
+                        <div>
+                            <t t-set="address_mode" t-value="mode[1]"/>
+                            <t t-if="is_public_order">
+                                <h3 class="mb-3">
+                                    <span t-if="account_on_checkout != 'mandatory'">Fill in your address</span>
+                                    <small class="text-muted" t-if="account_on_checkout == 'optional'">or</small>
+                                    <a t-if="account_on_checkout != 'disabled'" role="button"
+                                       href='/web/login?redirect=/shop/checkout' style="margin-top: -11px">Sign in
+                                    </a>
+                                </h3>
+                            </t>
+
+                            <h3 class="mb-3">Address</h3>
+
+                            <!--                                        <t t-if="partner_id == website_sale_order.partner_shipping_id.id == website_sale_order.partner_invoice_id.id">-->
+                            <!--                                            <div class="alert alert-warning" role="alert" t-if="not only_services">-->
+                            <!--                                                <h4 class="alert-heading">Be aware!</h4>-->
+                            <!--                                                <p  groups="account.group_delivery_invoice_address">-->
+                            <!--                                                    You are editing your <b>billing and shipping</b> addresses at the same time!<br/>-->
+                            <!--                                                    If you want to modify your shipping address, create a <a href='/shop/address'>new address</a>.-->
+                            <!--                                                </p>-->
+                            <!--                                            </div>-->
+                            <!--                                        </t>-->
+                            <t t-if="error" t-foreach="error.get('error_message', [])" t-as="err">
+                                <h5 class="text-danger" t-esc="err"/>
+                            </t>
+                            <form t-if="account_on_checkout != 'mandatory' or not is_public_user" action="/shop/address"
+                                  method="post" class="checkout_autoformat">
+                                <div class="row">
+                                    <div t-attf-class="#{error.get('name') and 'o_has_error'} div_name col-lg-12 mb-2">
+                                        <label class="col-form-label" for="name">Full name</label>
+                                        <input type="text" name="name"
+                                               t-attf-class="form-control #{error.get('name') and 'is-invalid' or ''}"
+                                               t-att-value="'name' in checkout and checkout['name']"/>
+                                    </div>
+                                    <div class="w-100"/>
+                                    <div t-attf-class="#{error.get('email') and 'o_has_error'} col-lg-6 mb-2"
+                                         id="div_email">
+                                        <label t-attf-class="col-form-label #{mode[1] == 'shipping' and 'label-optional' or ''}"
+                                               for="email">Email
+                                        </label>
+                                        <input type="email" name="email"
+                                               t-attf-class="form-control #{error.get('email') and 'is-invalid' or ''}"
+                                               t-att-value="'email' in checkout and checkout['email']"/>
+                                    </div>
+                                    <div t-attf-class="#{error.get('phone') and 'o_has_error'} col-lg-6 mb-2"
+                                         id="div_phone">
+                                        <label class="col-form-label" for="phone">Phone</label>
+                                        <input type="tel" name="phone"
+                                               t-attf-class="form-control #{error.get('phone') and 'is-invalid' or ''}"
+                                               t-att-value="'phone' in checkout and checkout['phone']"/>
+                                    </div>
+                                    <t t-if="website._display_partner_b2b_fields()">
+                                        <div class="w-100"/>
+                                        <t t-set='vat_warning'
+                                           t-value="'vat' in checkout and checkout['vat'] and not can_edit_vat"/>
+                                        <t t-if="(mode == ('new', 'billing') and is_public_order
+                                                        or mode == ('edit', 'billing') and partner_id == website_sale_order.partner_id.id)
+                                                        and (can_edit_vat or 'vat' in checkout and checkout['vat'])"
+                                        >
+                                            <div t-attf-class="#{error.get('company_name') and 'o_has_error'} col-lg-6 mb-2">
+                                                <label class="col-form-label fw-normal label-optional"
+                                                       for="company_name">Company Name
+                                                </label>
+                                                <input type="text" name="company_name"
+                                                       t-attf-class="form-control #{error.get('company_name') and 'is-invalid' or ''}"
+                                                       t-att-value="'commercial_company_name' in checkout and checkout['commercial_company_name'] or 'company_name' in checkout and checkout['company_name']"
+                                                       t-att-readonly="'1' if vat_warning else None"/>
+                                                <small t-if="vat_warning"
+                                                       class="form-text text-muted d-block d-lg-none">Changing company
+                                                    name is not allowed once document(s) have been issued for your
+                                                    account. Please contact us directly for this operation.
+                                                </small>
+                                            </div>
+                                            <div t-attf-class="#{error.get('vat') and 'o_has_error'} div_vat col-lg-6 mb-2">
+                                                <label class="col-form-label fw-normal label-optional" for="vat">VAT
+                                                </label>
+                                                <input type="text" name="vat"
+                                                       t-attf-class="form-control #{error.get('vat') and 'is-invalid' or ''}"
+                                                       t-att-value="'vat' in checkout and checkout['vat']"
+                                                       t-att-readonly="'1' if vat_warning else None"/>
+                                                <small t-if="vat_warning"
+                                                       class="form-text text-muted d-block d-lg-none">Changing VAT
+                                                    number is not allowed once document(s) have been issued for your
+                                                    account. Please contact us directly for this operation.
+                                                </small>
+                                            </div>
+                                            <div t-if="vat_warning" class="col-12 d-none d-lg-block mb-1">
+                                                <small class="form-text text-muted">Changing company name or VAT number
+                                                    is not allowed once document(s) have been issued for your account.
+                                                    Please contact us directly for this operation.
+                                                </small>
+                                            </div>
+                                        </t>
+                                    </t>
+                                    <div t-attf-class="#{error.get('street') and 'o_has_error'} div_street col-lg-12 mb-2">
+                                        <label class="col-form-label" for="street">Street and Number</label>
+                                        <input type="text" name="street"
+                                               t-attf-class="form-control #{error.get('street') and 'is-invalid' or ''}"
+                                               t-att-value="'street' in checkout and checkout['street']"/>
+                                    </div>
+                                    <div t-attf-class="mb-2 #{error.get('street2') and 'o_has_error' or ''} col-lg-12 div_street2">
+                                        <label class="col-form-label label-optional" for="street2">Apartment, suite,
+                                            etc.
+                                        </label>
+                                        <input type="text" name="street2"
+                                               t-attf-class="form-control #{error.get('street2') and 'is-invalid' or ''}"
+                                               t-att-value="'street2' in checkout and checkout['street2']"/>
+                                    </div>
+                                    <div class="w-100"/>
+                                    <t t-set='zip_city'
+                                       t-value='country and [x for x in country.get_address_fields() if x in ["zip", "city"]] or ["city", "zip"]'/>
+                                    <t t-if="'zip' in zip_city and zip_city.index('zip') &lt; zip_city.index('city')">
+                                        <div t-attf-class="#{error.get('zip') and 'o_has_error'} div_zip col-md-4 mb-2">
+                                            <label class="col-form-label label-optional" for="zip">Zip Code</label>
+                                            <input type="text" name="zip"
+                                                   t-attf-class="form-control #{error.get('zip') and 'is-invalid' or ''}"
+                                                   t-att-value="'zip' in checkout and checkout['zip']"/>
+                                        </div>
+                                    </t>
+                                    <div t-attf-class="#{error.get('city') and 'o_has_error' or ''} div_city col-md-8 mb-2"
+                                         style="display:none;">
+                                        <label class="col-form-label" for="city" style="display:none;">City</label>
+                                        <input id="city" type="text" name="city" style="display:none;"
+                                               t-attf-class="form-control #{error.get('city') and 'is-invalid' or ''}"
+                                               t-att-value="'city' in checkout and checkout['city']"/>
+                                    </div>
+                                    <!--                                                <t t-if="'zip' in zip_city and zip_city.index('zip') &gt; zip_city.index('city')">-->
+                                    <!--                                                    <div t-attf-class="#{error.get('zip') and 'o_has_error'} div_zip col-md-4 mb-2">-->
+                                    <!--                                                        <label class="col-form-label label-optional" for="zip">Zip Code</label>-->
+                                    <!--                                                        <input type="text" name="zip" t-attf-class="form-control #{error.get('zip') and 'is-invalid' or ''}" t-att-value="'zip' in checkout and checkout['zip']" />-->
+                                    <!--                                                    </div>-->
+                                    <!--                                                </t>-->
+                                    <div class="w-100"/>
+                                    <div t-attf-class="#{error.get('country_id') and 'o_has_error'} div_country col-lg-6 mb-2">
+                                        <label class="col-form-label" for="country_id">Country</label>
+                                        <select id="country_id" name="country_id"
+                                                t-attf-class="form-select #{error.get('country_id') and 'is-invalid' or ''}"
+                                                t-att-mode="mode[1]">
+                                            <option value="">Country...</option>
+                                            <t t-foreach="countries" t-as="c">
+                                                <option t-att-value="c.id"
+                                                        t-att-selected="c.id == (country and country.id or -1)">
+                                                    <t t-esc="c.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div t-attf-class="#{error.get('state_id') and 'o_has_error'} div_state col-lg-6 mb-2"
+                                         t-att-style="(not country or not country.state_ids) and 'display: none'">
+                                        <label class="col-form-label" for="state_id">State / Province
+                                        </label>
+                                        <select id="state_id" name="state_id"
+                                                t-attf-class="form-select #{error.get('state_id') and 'is-invalid' or ''}"
+                                                data-init="1" onchange="onStateChange()">
+                                            <option value="">State / Province...</option>
+                                            <t t-foreach="country_states" t-as="s">
+                                                <option t-att-value="s.id"
+                                                        t-att-selected="s.id == ('state_id' in checkout and country and checkout['state_id'] != '' and int(checkout['state_id']))">
+                                                    <t t-esc="s.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div t-attf-class="#{error.get('state_id') and 'o_has_error'} div_state col-lg-6 mb-2"
+                                         t-att-style="(not country or not country.state_ids) and 'display: none'">
+                                        <label class="col-form-label" for="city_id">City</label>
+                                        <select id="city_id" name="city_id"
+                                                t-attf-class="form-select #{error.get('state_id') and 'is-invalid' or ''}"
+                                                data-init="1" onchange="onCityChange()">
+                                            <option value="">City...</option>
+                                            <t t-foreach="district_city" t-as="c">
+                                                <option t-att-value="c.id"
+                                                        t-att-selected="c.id == ('city_id' in checkout and country and checkout['city_id'] != '' and int(checkout['city_id']))">
+                                                    <t t-esc="c.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div t-attf-class="#{error.get('state_id') and 'o_has_error'} div_state col-lg-6 mb-2"
+                                         t-att-style="(not country or not country.state_ids) and 'display: none'">
+                                        <label class="col-form-label" for="dist_id">District</label>
+                                        <select id="dist_id" name="dist_id"
+                                                t-attf-class="form-select #{error.get('state_id') and 'is-invalid' or ''}"
+                                                data-init="1" onchange="onDistrictChange()">
+                                            <option value="">District...</option>
+                                            <t t-foreach="state_district" t-as="d">
+                                                <option t-att-value="d.id"
+                                                        t-att-selected="d.id == ('dist_id' in checkout and country and checkout['dist_id'] != '' and int(checkout['dist_id']))">
+
+                                                <t t-esc="d.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+
+
+                                    <script type="text/javascript">
+                                        function onStateChange() {
+                                        var stateId = document.getElementById('state_id').value;
+                                        if (stateId) {
+                                        fetch('/get_cities', {
+                                        method: 'POST',
+                                        headers: {
+                                        'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({'state_id': stateId})
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                        console.log(data);
+                                        console.log(data);
+                                        console.log(data);
+                                        console.log(data.result.cities);
+                                        var districtSelect = document.getElementById('city_id');
+                                        districtSelect.innerHTML = '<option value="">City...</option>';
+                                        if (Array.isArray(data.result.cities)) {
+                                        data.result.cities.forEach(function (district) {
+                                        var option = document.createElement('option');
+                                        option.value = district.id;
+                                        option.textContent = district.name;
+                                        districtSelect.appendChild(option);
+                                        });
+                                        }
+                                        var citySelect = document.getElementById('dist_id');
+                                        citySelect.innerHTML = '<option value="">District...</option>';
+                                        })
+                                        .catch(error => console.error('Error:', error));
+                                        }
+                                        }
+
+                                        function onCityChange() {
+                                        var city_id = document.getElementById('city_id').value;
+                                        if (city_id) {
+                                        fetch('/get_districts', {
+                                        method: 'POST',
+                                        headers: {
+                                        'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({'city_id': city_id})
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                        console.log(data);
+                                        console.log(data);
+                                        console.log(data);
+                                        var citySelect = document.getElementById('dist_id');
+                                        citySelect.innerHTML = '<option value="">District...</option>';
+                                        if (Array.isArray(data.result.districts)) {
+                                        data.result.districts.forEach(function (city) {
+                                        var option = document.createElement('option');
+                                        option.value = city.id;
+                                        option.textContent = city.name;
+                                        citySelect.appendChild(option);
+                                        });
+                                        }
+                                        })
+                                        .catch(error => console.error('Error:', error));
+                                        }
+
+                                        var districtSelect = document.getElementById('dist_id');
+                                        var selectedDist = districtSelect.options[districtSelect.selectedIndex].text;
+                                        document.getElementById('city').value = selectedDist;
+
+                                        }
+                                        function onDistrictChange() {
+                                        var districtSelect = document.getElementById('dist_id');
+                                        var selectedDist = districtSelect.options[districtSelect.selectedIndex].text;
+
+                                        var citySelect = document.getElementById('city_id');
+                                        var selectedCity = citySelect.options[citySelect.selectedIndex].text;
+                                        document.getElementById('city').value = selectedDist + ',' + selectedCity;
+                                        console.log('selectedDist');
+                                        console.log('selectedDist');
+                                        console.log(selectedDist);
+                                        console.log(selectedCity);
+                                        console.log(document.getElementById('city').value);
+                                        }
+                                    </script>
+
+
+                                    <div class="w-100"/>
+                                    <t t-if="mode == ('new', 'billing') and not only_services">
+                                        <div class="col-lg-12">
+                                            <div class="form-check form-switch mt-2 mb-3">
+                                                <label>
+                                                    <input
+                                                            type="checkbox"
+                                                            id="shipping_use_same"
+                                                            class="form-check-input mr8"
+                                                            name="use_same"
+                                                            value="1"
+                                                            t-att-checked="use_same"/>Ship to the same address
+                                                    <span
+                                                            t-if="is_public_user"
+                                                            class="form-check-label ship_to_other text-muted"
+                                                            style="display: none">
+                                                        &amp;nbsp;(
+                                                        <i>Your shipping address will be requested later)</i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <input type="hidden" name="use_same" t-att-value="1"/>
+                                    </t>
+                                </div>
+
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"
+                                       t-nocache="The csrf token must always be up to date."/>
+                                <input type="hidden" name="submitted" value="1"/>
+                                <input type="hidden" name="partner_id" t-att-value="partner_id or '0'"/>
+                                <input type="hidden" name="mode" t-att-value="mode[1]"/>
+                                <input type="hidden" name="callback" t-att-value="callback"/>
+
+                                <!-- Example -->
+                                <input type="hidden" name="field_required" t-att-value="'name,street'"/>
+
+                                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between mt32 mb32">
+                                    <a role="button"
+                                       t-att-href="mode == ('new', 'billing') and '/shop/cart' or '/shop/checkout'"
+                                       class="btn btn-outline-secondary w-100 w-md-auto order-md-1 order-3">
+                                        <i class="fw-light fa fa-angle-left me-2"/>Discard
+                                    </a>
+                                    <div class="position-relative w-100 d-flex d-md-none justify-content-center align-items-center order-2 my-2 opacity-75">
+                                        <hr class="w-100"/>
+                                        <span class="px-3">or</span>
+                                        <hr class="w-100"/>
+                                    </div>
+                                    <a role="button" href="/shop/payment"
+                                       class="a-submit a-submit-disable a-submit-loading btn btn-primary w-100 w-md-auto order-1 order-md-3">
+                                        <t t-if="mode == ('new', 'billing')">
+                                            Continue checkout
+                                        </t>
+                                        <t t-else="">
+                                            Save address
+                                        </t>
+                                        <i class="fw-light fa fa-angle-right ms-2"/>
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </xpath>
+    </template>
+    <template inherit_id="portal.portal_my_home" id="portal_my_home" name="My Portal">
+        <xpath expr="//div[@id='portal_common_category']/t[2]/t[2]"
+               position="replace">
+                            <t t-set="title">Security</t>
+
+        </xpath>
+        <xpath expr="//div[@id='portal_common_category']/t[2]/t[3]"
+               position="replace">
+                            <t t-set="text">Security and Login Management</t>
+
+        </xpath>
+    </template>
+    <template inherit_id="portal.portal_my_security" id="portal_my_security" name="My Portal Security">
+        <xpath expr="//div[contains(@class, 'd-flex')]/h3[contains(@class, 'my-0')]"
+               position="replace">
+                <h3 class="my-0">Security</h3>
+        </xpath>
+    </template>
+    <template inherit_id="portal.portal_my_details_fields" id="portal_my_details_fields">
+
+
+        <div t-attf-class="mb-3 #{error.get('city') and 'o_has_error' or ''} col-xl-6" position="replace">
+            <div style="display:none;" t-attf-class="mb-3 #{error.get('city') and 'o_has_error' or ''} col-xl-6">
+                <label class="col-form-label" for="city">City</label>
+                <input type="text" id="city" name="city" t-attf-class="form-control #{error.get('city') and 'is-invalid' or ''}"
+                       t-att-value="city or partner.city"/>
+            </div>
+        </div>
+        <div t-attf-class="mb-3 #{error.get('zip') and 'o_has_error' or ''} col-xl-6" position="replace">
+            <div style="display:none;" t-attf-class="mb-3 #{error.get('zip') and 'o_has_error' or ''} col-xl-6">
+                <label class="col-form-label label-optional" for="zipcode">Zip / Postal Code</label>
+                <input type="text" name="zipcode" t-attf-class="form-control #{error.get('zip') and 'is-invalid' or ''}"
+                       t-att-value="zipcode or partner.zip"/>
+            </div>
+        </div>
+<!--        <div t-attf-class="mb-3 #{error.get('country_id') and 'o_has_error' or ''} col-xl-6">-->
+<!--            <label class="col-form-label" for="country_id">Country</label>-->
+<!--            <select name="country_id" t-attf-class="form-select #{error.get('country_id') and 'is-invalid' or ''}" t-att-disabled="None if partner_can_edit_vat else '1'">-->
+<!--                <option value="">Country...</option>-->
+<!--                <t t-foreach="countries or []" t-as="country">-->
+<!--                    <option t-att-value="country.id" t-att-selected="country.id == int(country_id) if country_id else country.id == partner.country_id.id">-->
+<!--                        <t t-esc="country.name" />-->
+<!--                    </option>-->
+<!--                </t>-->
+<!--            </select>-->
+<!--            <small t-if="not partner_can_edit_vat" class="form-text text-muted d-block d-xl-none">Changing the country is not allowed once document(s) have been issued for your account. Please contact us directly for this operation.</small>-->
+<!--        </div>-->
+        <div t-attf-class="mb-3 #{error.get('state_id') and 'o_has_error' or ''} col-xl-6" position="replace">
+        <div t-attf-class="mb-3 #{error.get('state_id') and 'o_has_error' or ''} col-xl-6">
+            <label class="col-form-label label-optional" for="state_id">State / Province</label>
+            <select name="state_id" t-attf-class="form-select #{error.get('state_id') and 'is-invalid' or ''}" onchange="onStateChange()">
+                <option value="">select...</option>
+                <t t-foreach="states or []" t-as="state">
+                    <option t-att-value="state.id" style="display:none;" t-att-data-country_id="state.country_id.id"
+                            t-att-selected="state.id == int(state_id) if state_id else state.id == partner.state_id.id">
+                        <t t-esc="state.name" />
+                    </option>
+                </t>
+            </select>
+        </div>
+
+            <div t-attf-class="#{error.get('state_id') and 'o_has_error'} div_state col-lg-6 mb-2"
+                 t-att-style="(not country or not country.state_ids) and 'display: none'">
+            <label class="col-form-label" for="city_id">City</label>
+                <select id="city_id" name="city_id"
+                        t-attf-class="form-select #{error.get('state_id') and 'is-invalid' or ''}"
+                        data-init="1" onchange="onCityChange()">
+                    <option value="">City...</option>
+                    <t t-foreach="district_city" t-as="c">
+                        <option t-att-value="c.id"
+                                t-att-selected="c.id == city_id">
+                            <t t-esc="c.name"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+
+            <div t-attf-class="#{error.get('state_id') and 'o_has_error'} div_state col-lg-6 mb-2"
+                 t-att-style="(not country or not country.state_ids) and 'display: none'">
+                <label class="col-form-label" for="dist_id">District</label>
+                <select id="dist_id" name="dist_id"
+                        t-attf-class="form-select #{error.get('state_id') and 'is-invalid' or ''}"
+                        data-init="1" onchange="onDistrictChange()">
+                    <option value="">District...</option>
+                    <t t-foreach="state_district" t-as="d">
+                        <option t-att-value="d.id"
+                                t-att-selected="d.id == dist_id">
+
+                            <t t-esc="d.name"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+
+            <script type="text/javascript">
+                function onStateChange() {
+                var stateId = document.getElementById('state_id').value;
+                if (stateId) {
+                fetch('/get_cities', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'state_id': stateId})
+                })
+                .then(response => response.json())
+                .then(data => {
+                console.log(data);
+                console.log(data);
+                console.log(data);
+                console.log(data.result.cities);
+                var districtSelect = document.getElementById('city_id');
+                districtSelect.innerHTML = '<option value="">City...</option>';
+                if (Array.isArray(data.result.cities)) {
+                data.result.cities.forEach(function (district) {
+                var option = document.createElement('option');
+                option.value = district.id;
+                option.textContent = district.name;
+                districtSelect.appendChild(option);
+                });
+                }
+                var citySelect = document.getElementById('dist_id');
+                citySelect.innerHTML = '<option value="">District...</option>';
+                })
+                .catch(error => console.error('Error:', error));
+                }
+                }
+
+                function onCityChange() {
+                var city_id = document.getElementById('city_id').value;
+                if (city_id) {
+                fetch('/get_districts', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'city_id': city_id})
+                })
+                .then(response => response.json())
+                .then(data => {
+                console.log(data);
+                console.log(data);
+                console.log(data);
+                var citySelect = document.getElementById('dist_id');
+                citySelect.innerHTML = '<option value="">District...</option>';
+                if (Array.isArray(data.result.districts)) {
+                data.result.districts.forEach(function (city) {
+                var option = document.createElement('option');
+                option.value = city.id;
+                option.textContent = city.name;
+                citySelect.appendChild(option);
+                });
+                }
+                })
+                .catch(error => console.error('Error:', error));
+                }
+
+                var districtSelect = document.getElementById('dist_id');
+                var selectedDist = districtSelect.options[districtSelect.selectedIndex].text;
+                document.getElementById('city').value = selectedDist;
+
+                }
+                function onDistrictChange() {
+                var districtSelect = document.getElementById('dist_id');
+                var selectedDist = districtSelect.options[districtSelect.selectedIndex].text;
+
+                var citySelect = document.getElementById('city_id');
+                var selectedCity = citySelect.options[citySelect.selectedIndex].text;
+                document.getElementById('city').value = selectedDist + ',' + selectedCity;
+                console.log('selectedDist');
+                console.log('selectedDist');
+                console.log(selectedDist);
+                console.log(selectedCity);
+                console.log(document.getElementById('city').value);
+                }
+            </script>
+        </div>
+    </template>
+
+    <template id="sale_order_portal_content" inherit_id="sale.sale_order_portal_content" name="Sales Order Portal Content">
+        <xpath expr="////tbody[@class='sale_tbody'][1]/t[3]" position="replace">
+            <t t-foreach="lines_to_report" t-as="line">
+                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>
+                <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                    <t t-if="not line.display_type">
+                        <td id="product_name">
+                            <span t-field="line.name"/>
+                        </td>
+                        <td class="text-end" id="quote_qty_td">
+                            <div id="quote_qty">
+                                <span t-field="line.product_uom_qty"/>
+                                <span t-field="line.product_uom"/>
+                            </div>
+                        </td>
+                        <td t-attf-class="text-end {{ 'd-none d-sm-table-cell' if report_type == 'html' else '' }}">
+                            <!--<div-->
+                            <!--    t-if="line.discount &gt;= 0"-->
+                            <!--    t-field="line.price_unit"-->
+                            <!--    t-att-style="line.discount and 'text-decoration: line-through' or None"-->
+                            <!--    t-att-class="(line.discount and 'text-danger' or '') + ' text-end'"-->
+                            <!--/>-->
+                            <span class="oe_order_line_price_subtotal" t-field="line.price_subtotal"/>
+
+                            <!--<div t-if="line.discount">-->
+                            <!--    <t t-out="(1-line.discount / 100.0) * line.price_unit" t-options='{"widget": "float", "decimal_precision": "Product Price"}'/>-->
+                            <!--</div>-->
+                        </td>
+                        <td t-if="display_discount"
+                            t-attf-class="text-end {{ 'd-none d-sm-table-cell' if report_type == 'html' else '' }}">
+                            <strong t-if="line.discount &gt; 0" class="text-info">
+                                <t t-out="((line.discount % 1) and '%s' or '%d') % line.discount"/>%
+                            </strong>
+                        </td>
+                        <td t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"
+                            id="taxes">
+                            <span t-out="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
+                        </td>
+                        <td t-if="not line.is_downpayment" class="text-end" id="subtotal">
+                            <!--<span class="oe_order_line_price_subtotal" t-field="line.price_subtotal"/>-->
+                            <div class="oe_order_line_price_subtotal"
+                                 t-if="line.discount &gt;= 0"
+                                 t-field="line.price_unit"
+                                 t-att-style="line.discount and 'text-decoration: line-through' or None"
+                                 t-att-class="(line.discount and 'text-danger' or '') + ' text-end'"
+                            />
+                            <div t-if="line.discount">
+                                <t t-out="(1-line.discount / 100.0) * line.price_unit"
+                                   t-options='{"widget": "float", "decimal_precision": "Product Price"}'/>
+                            </div>
+
+
+                        </td>
+                    </t>
+                    <t t-if="line.display_type == 'line_section'">
+                        <td colspan="99">
+                            <span t-field="line.name"/>
+                        </td>
+                        <t t-set="current_section" t-value="line"/>
+                        <t t-set="current_subtotal" t-value="0"/>
+                    </t>
+                    <t t-if="line.display_type == 'line_note'">
+                        <td colspan="99">
+                            <span t-field="line.name"/>
+                        </td>
+                    </t>
+                </tr>
+                <tr t-if="current_section and (line_last or lines_to_report[line_index+1].display_type == 'line_section') and not line.is_downpayment"
+                    class="is-subtotal text-end">
+                    <td colspan="99">
+                        <strong class="mr16">Subtotal</strong>
+                        <span t-out="current_subtotal"
+                              t-options='{"widget": "monetary", "display_currency": sale_order.currency_id}'
+                        />
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,53 @@
+.o_tag {
+    display: inline-block;
+    font-size: 0.875em;
+    padding: 0.2em 0.6em;
+    margin: 0.2em;
+    border-radius: 0.25em;
+    font-weight: 600;
+    background-color: #d9534f; /* Similar to archive tag color */
+    color: #fff;
+}
+/* static/src/css/custom.css */
+
+.oe_compare_price {
+    color: #ff0000; /* Red color to indicate it's the old price */
+    text-decoration: line-through; /* Strike-through to show it's a previous price */
+    font-size: 0.9em; /* Slightly smaller font size to distinguish it from the current price */
+    margin-left: 10px; /* Spacing between the current price and the compare price */
+    vertical-align: middle; /* Aligns vertically with the current price */
+}
+
+.o_tag_discount {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    z-index: 10;
+}
+.o_tag_2 {
+    display: inline-block;
+    font-size: 0.875em;
+    padding: 0.2em 0.6em;
+    margin: 0.2em;
+    border-radius: 0.25em;
+    font-weight: 600;
+    background-color: #d9534f; /* Similar to archive tag color */
+    color: #fff;
+}
+
+.o_tag_discount_2 {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 10;
+}
+.product-name {
+white-space: normal;
+word-wrap: break-word;
+overflow-wrap: break-word;
+}
+.o_wsale_products_item_title {
+white-space: normal;
+word-wrap: break-word;
+overflow-wrap: break-word;
+}
